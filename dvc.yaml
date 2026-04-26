@@ -1,0 +1,24 @@
+stages:
+  data_ingestion:
+   cmd: python scr/data_ingestion.py 
+   deps:
+   - scr/data_ingestion.py
+   outs:
+   - data/raw
+
+  preprocess:
+   cmd: python scr/preprocess.py
+   deps:
+   - scr/preprocess.py
+   - data/raw
+   outs:
+   - data/interim
+
+
+  model_train:
+   cmd: python scr/model_training.py
+   deps:
+   - data/interim
+   - scr/model_training.py
+   outs:
+   - models/random_forest.pkl

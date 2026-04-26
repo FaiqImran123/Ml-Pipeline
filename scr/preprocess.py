@@ -5,18 +5,28 @@ import os
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
+
+# =========================
+# PATH SETUP (IMPORTANT FIX)
+# =========================
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+LOGS_DIR = os.path.join(BASE_DIR, "logs")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+
 # =========================
 # LOGGING SETUP
 # =========================
 
-logs_dir = "../logs"
-os.makedirs(logs_dir, exist_ok=True)
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 logger = logging.getLogger("data_pipeline")
 logger.setLevel(logging.DEBUG)
 
 console_handler = logging.StreamHandler()
-file_handler = logging.FileHandler(os.path.join(logs_dir, "data_pipeline.log"))
+file_handler = logging.FileHandler(os.path.join(LOGS_DIR, "data_pipeline.log"))
 
 formatter = logging.Formatter(
     "%(asctime)s - %(levelname)s - %(message)s"
@@ -31,7 +41,7 @@ if not logger.handlers:
 
 
 # =========================
-# GLOBAL ENCODERS (NO LEAKAGE)
+# GLOBAL ENCODERS
 # =========================
 
 label_encoder = LabelEncoder()
@@ -41,6 +51,7 @@ ohe = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
 # =========================
 # FIT ON TRAIN ONLY
 # =========================
+
 def fit_preprocess(df: pd.DataFrame):
 
     try:
@@ -49,7 +60,7 @@ def fit_preprocess(df: pd.DataFrame):
         # Encode Gender
         df["Gender"] = label_encoder.fit_transform(df["Gender"])
 
-        # One Hot Encode Geography
+        # One-hot encode Geography
         geo = np.array(df["Geography"]).reshape(-1, 1)
         ohe.fit(geo)
 
@@ -71,17 +82,18 @@ def fit_preprocess(df: pd.DataFrame):
 
 
 # =========================
-# TRANSFORM ON TEST ONLY
+# TRANSFORM TEST ONLY
 # =========================
+
 def transform_preprocess(df: pd.DataFrame):
 
     try:
         logger.info("Transforming TEST data...")
 
-        # Transform Gender
+        # Encode Gender
         df["Gender"] = label_encoder.transform(df["Gender"])
 
-        # Transform Geography
+        # One-hot encode Geography
         geo = np.array(df["Geography"]).reshape(-1, 1)
 
         geo_encoded = pd.DataFrame(
@@ -104,12 +116,13 @@ def transform_preprocess(df: pd.DataFrame):
 # =========================
 # SAVE INTERIM DATA
 # =========================
-def save_interim(train_data, test_data, save_dir="data"):
+
+def save_interim(train_data, test_data):
 
     try:
         logger.info("Saving interim data...")
 
-        interim_dir = os.path.join(save_dir, "interim")
+        interim_dir = os.path.join(DATA_DIR, "interim")
         os.makedirs(interim_dir, exist_ok=True)
 
         train_path = os.path.join(interim_dir, "train.csv")
@@ -118,8 +131,8 @@ def save_interim(train_data, test_data, save_dir="data"):
         train_data.to_csv(train_path, index=False)
         test_data.to_csv(test_path, index=False)
 
-        logger.info("Train saved at %s", train_path)
-        logger.info("Test saved at %s", test_path)
+        logger.info(f"Train saved at {train_path}")
+        logger.info(f"Test saved at {test_path}")
 
     except Exception as e:
         logger.error("Error saving interim data: %s", str(e))
@@ -128,14 +141,17 @@ def save_interim(train_data, test_data, save_dir="data"):
 # =========================
 # MAIN PIPELINE
 # =========================
+
 def main():
 
     logger.info("PIPELINE STARTED")
 
     # -------- Load RAW data --------
     try:
-        train_df = pd.read_csv("../data/raw/train.csv")
-        test_df = pd.read_csv("../data/raw/test.csv")
+        raw_dir = os.path.join(DATA_DIR, "raw")
+
+        train_df = pd.read_csv(os.path.join(raw_dir, "train.csv"))
+        test_df = pd.read_csv(os.path.join(raw_dir, "test.csv"))
 
         logger.info("Raw data loaded successfully")
 
@@ -143,7 +159,7 @@ def main():
         logger.error("Error loading raw data: %s", str(e))
         return
 
-    # -------- FIT on TRAIN --------
+    # -------- FIT TRAIN --------
     train_df = fit_preprocess(train_df)
 
     if train_df is None:
@@ -158,7 +174,7 @@ def main():
         return
 
     # -------- SAVE INTERIM --------
-    save_interim(train_df, test_df, save_dir="../data")
+    save_interim(train_df, test_df)
 
     logger.info("PIPELINE COMPLETED SUCCESSFULLY")
 
@@ -166,5 +182,6 @@ def main():
 # =========================
 # RUN
 # =========================
+
 if __name__ == "__main__":
     main()

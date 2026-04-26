@@ -1,0 +1,50 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python scr/data_ingestion.py
+    deps:
+    - path: scr/data_ingestion.py
+      hash: md5
+      md5: ecf8d44e0639f66cdf10ca2024ea141d
+      size: 3779
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 0253c901ddb8b22c948ff5b526ec95b9.dir
+      size: 479315
+      nfiles: 2
+  preprocess:
+    cmd: python scr/preprocess.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 0253c901ddb8b22c948ff5b526ec95b9.dir
+      size: 479315
+      nfiles: 2
+    - path: scr/preprocess.py
+      hash: md5
+      md5: c073d761fe3ac7ec9a8cb07b9f26b4e3
+      size: 4740
+    outs:
+    - path: data/interim
+      hash: md5
+      md5: 0b92b79d61b28091c7955bdc59540ff7.dir
+      size: 490279
+      nfiles: 2
+  model_train:
+    cmd: python scr/model_training.py
+    deps:
+    - path: data/interim
+      hash: md5
+      md5: 0b92b79d61b28091c7955bdc59540ff7.dir
+      size: 490279
+      nfiles: 2
+    - path: scr/model_training.py
+      hash: md5
+      md5: d110654fb72e5e108cd59e72a5df9183
+      size: 3497
+    outs:
+    - path: models/random_forest.pkl
+      hash: md5
+      md5: 720d4c0f45e451cbcac26dbcb45d165e
+      size: 9522793
