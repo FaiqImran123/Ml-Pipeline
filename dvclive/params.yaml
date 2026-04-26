@@ -1,24 +1,22 @@
 data_ingestion:
-  dataset_url: "https://raw.githubusercontent.com/FaiqImran123/CustomerChurnPred/FaiqImran123/Churn_Modelling.csv"
+  dataset_url: 
+    https://raw.githubusercontent.com/FaiqImran123/CustomerChurnPred/FaiqImran123/Churn_Modelling.csv
   test_size: 0.3
   random_state: 42
-
 preprocessing:
   drop_columns:
-    - RowNumber
-    - CustomerId
-    - Surname
+  - RowNumber
+  - CustomerId
+  - Surname
   categorical_features:
-    - Gender
-    - Geography
+  - Gender
+  - Geography
   one_hot_encoding:
     handle_unknown: ignore
-
 model_training:
   n_estimators: 100
   max_depth: 12
   random_state: 42
-
 paths:
   raw_data: data/raw
   interim_data: data/interim

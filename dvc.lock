@@ -12,7 +12,7 @@ stages:
         data_ingestion:
           dataset_url: 
             https://raw.githubusercontent.com/FaiqImran123/CustomerChurnPred/FaiqImran123/Churn_Modelling.csv
-          test_size: 0.2
+          test_size: 0.3
           random_state: 42
         preprocessing:
           drop_columns:
@@ -27,7 +27,7 @@ stages:
     outs:
     - path: data/raw
       hash: md5
-      md5: 0253c901ddb8b22c948ff5b526ec95b9.dir
+      md5: 65260b285cc09dec9f9d14eea77f0523.dir
       size: 479315
       nfiles: 2
   preprocess:
@@ -35,7 +35,7 @@ stages:
     deps:
     - path: data/raw
       hash: md5
-      md5: 0253c901ddb8b22c948ff5b526ec95b9.dir
+      md5: 65260b285cc09dec9f9d14eea77f0523.dir
       size: 479315
       nfiles: 2
     - path: scr/preprocess.py
@@ -57,7 +57,7 @@ stages:
     outs:
     - path: data/interim
       hash: md5
-      md5: 0b92b79d61b28091c7955bdc59540ff7.dir
+      md5: 9c4b26f87ec2c38bb9d7714bec139748.dir
       size: 490279
       nfiles: 2
   model_train:
@@ -65,21 +65,21 @@ stages:
     deps:
     - path: data/interim
       hash: md5
-      md5: 0b92b79d61b28091c7955bdc59540ff7.dir
+      md5: 9c4b26f87ec2c38bb9d7714bec139748.dir
       size: 490279
       nfiles: 2
     - path: scr/model_training.py
       hash: md5
-      md5: a44b4b13db60b6dfd964e85f00e4c2b2
-      size: 3945
+      md5: bae2d5b1ad7cb53259eb24193c389336
+      size: 4095
     params:
       params.yaml:
         model_training:
-          n_estimators: 200
-          max_depth: 10
+          n_estimators: 100
+          max_depth: 12
           random_state: 42
     outs:
     - path: models/random_forest.pkl
       hash: md5
-      md5: 720d4c0f45e451cbcac26dbcb45d165e
-      size: 9522793
+      md5: 5088204c709908bda21803fcfa769685
+      size: 8357993

@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import joblib
 import yaml   # ✅ ADDED ONLY
-
+from dvclive import Live
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
@@ -149,9 +149,12 @@ def main():
 
     model = train_model(X_train, y_train)
 
-    evaluate_model(model, X_test, y_test)
+    acc =evaluate_model(model, X_test, y_test)
 
     save_model(model, "random_forest.pkl")
+    with Live(save_dvc_exp =True) as live:
+        live.log_metric("accuracy",   acc)
+        live.log_params(config)
 
     logger.info("PIPELINE COMPLETED SUCCESSFULLY")
 
