@@ -2,16 +2,26 @@ import os
 import logging
 import pandas as pd
 import joblib
+import yaml   # ✅ ADDED ONLY
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
 
 # =========================
-# PATH SETUP (IMPORTANT FIX)
+# LOAD PARAMS.YAML (ADDED ONLY)
 # =========================
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+CONFIG_PATH = os.path.join(BASE_DIR, "params.yaml")
+
+with open(CONFIG_PATH, "r") as f:
+    config = yaml.safe_load(f)
+
+
+# =========================
+# PATH SETUP (UNCHANGED)
+# =========================
 
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
@@ -19,7 +29,7 @@ MODELS_DIR = os.path.join(BASE_DIR, "models")
 
 
 # =========================
-# LOGGING SETUP
+# LOGGING SETUP (UNCHANGED)
 # =========================
 
 os.makedirs(LOGS_DIR, exist_ok=True)
@@ -44,7 +54,7 @@ if not logger.handlers:
 
 
 # =========================
-# LOAD DATA
+# LOAD DATA (UNCHANGED)
 # =========================
 
 def load_data():
@@ -69,21 +79,25 @@ def load_data():
 
 
 # =========================
-# TRAIN MODEL
+# TRAIN MODEL (ONLY CHANGE HERE)
 # =========================
 
-def train_model(X_train, y_train, n_estimators=100, max_depth=None):
+def train_model(X_train, y_train):
 
     logger.info("Initializing RandomForest model...")
 
+    params = config["model_training"]   # ✅ ADDED
+
     model = RandomForestClassifier(
-        n_estimators=n_estimators,
-        max_depth=max_depth,
-        random_state=42,
+        n_estimators=params["n_estimators"],   # ✅ CHANGED
+        max_depth=params["max_depth"],         # ✅ CHANGED
+        random_state=params["random_state"],   # (now from YAML)
         n_jobs=-1
     )
 
-    logger.info(f"Training model with n_estimators={n_estimators}, max_depth={max_depth}")
+    logger.info(
+        f"Training model with n_estimators={params['n_estimators']}, max_depth={params['max_depth']}"
+    )
 
     model.fit(X_train, y_train)
 
@@ -93,7 +107,7 @@ def train_model(X_train, y_train, n_estimators=100, max_depth=None):
 
 
 # =========================
-# EVALUATE MODEL
+# EVALUATE MODEL (UNCHANGED)
 # =========================
 
 def evaluate_model(model, X_test, y_test):
@@ -111,7 +125,7 @@ def evaluate_model(model, X_test, y_test):
 
 
 # =========================
-# SAVE MODEL
+# SAVE MODEL (UNCHANGED except optional config use not needed)
 # =========================
 
 def save_model(model, model_name="random_forest.pkl"):
@@ -126,19 +140,14 @@ def save_model(model, model_name="random_forest.pkl"):
 
 
 # =========================
-# MAIN PIPELINE
+# MAIN PIPELINE (UNCHANGED LOGIC)
 # =========================
 
 def main():
 
     X_train, X_test, y_train, y_test = load_data()
 
-    model = train_model(
-        X_train,
-        y_train,
-        n_estimators=200,
-        max_depth=10
-    )
+    model = train_model(X_train, y_train)
 
     evaluate_model(model, X_test, y_test)
 

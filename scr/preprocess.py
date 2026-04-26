@@ -2,22 +2,32 @@ import numpy as np
 import pandas as pd
 import logging
 import os
+import yaml   # ✅ ADDED ONLY
 
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 
 # =========================
-# PATH SETUP (IMPORTANT FIX)
+# LOAD PARAMS.YAML (ADDED ONLY)
 # =========================
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+CONFIG_PATH = os.path.join(BASE_DIR, "params.yaml")
+
+with open(CONFIG_PATH, "r") as f:
+    config = yaml.safe_load(f)
+
+
+# =========================
+# PATH SETUP (UNCHANGED)
+# =========================
 
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 
 # =========================
-# LOGGING SETUP
+# LOGGING SETUP (UNCHANGED)
 # =========================
 
 os.makedirs(LOGS_DIR, exist_ok=True)
@@ -41,11 +51,15 @@ if not logger.handlers:
 
 
 # =========================
-# GLOBAL ENCODERS
+# GLOBAL ENCODERS (UNCHANGED)
 # =========================
 
 label_encoder = LabelEncoder()
-ohe = OneHotEncoder(sparse_output=False, handle_unknown="ignore")
+
+ohe = OneHotEncoder(
+    sparse_output=False,
+    handle_unknown=config["preprocessing"]["one_hot_encoding"]["handle_unknown"]  # ✅ ONLY CHANGE HERE
+)
 
 
 # =========================
@@ -114,7 +128,7 @@ def transform_preprocess(df: pd.DataFrame):
 
 
 # =========================
-# SAVE INTERIM DATA
+# SAVE INTERIM DATA (UNCHANGED)
 # =========================
 
 def save_interim(train_data, test_data):
@@ -139,7 +153,7 @@ def save_interim(train_data, test_data):
 
 
 # =========================
-# MAIN PIPELINE
+# MAIN PIPELINE (UNCHANGED LOGIC)
 # =========================
 
 def main():

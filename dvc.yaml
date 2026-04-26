@@ -1,24 +1,33 @@
 stages:
   data_ingestion:
-   cmd: python scr/data_ingestion.py 
-   deps:
-   - scr/data_ingestion.py
-   outs:
-   - data/raw
+    cmd: python scr/data_ingestion.py
+    deps:
+      - scr/data_ingestion.py
+    params:
+      - params.yaml:
+          - data_ingestion
+          - preprocessing
+    outs:
+      - data/raw
 
   preprocess:
-   cmd: python scr/preprocess.py
-   deps:
-   - scr/preprocess.py
-   - data/raw
-   outs:
-   - data/interim
-
+    cmd: python scr/preprocess.py
+    deps:
+      - scr/preprocess.py
+      - data/raw
+    params:
+      - params.yaml:
+          - preprocessing
+    outs:
+      - data/interim
 
   model_train:
-   cmd: python scr/model_training.py
-   deps:
-   - data/interim
-   - scr/model_training.py
-   outs:
-   - models/random_forest.pkl
+    cmd: python scr/model_training.py
+    deps:
+      - data/interim
+      - scr/model_training.py
+    params:
+      - params.yaml:
+          - model_training
+    outs:
+      - models/random_forest.pkl
