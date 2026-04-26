@@ -75,11 +75,11 @@ stages:
     params:
       params.yaml:
         model_training:
-          n_estimators: 100
+          n_estimators: 50
           max_depth: 12
           random_state: 42
     outs:
     - path: models/random_forest.pkl
       hash: md5
-      md5: 5088204c709908bda21803fcfa769685
-      size: 8357993
+      md5: 38c67cf2809749bd7bc40e0743afe097
+      size: 4187593
