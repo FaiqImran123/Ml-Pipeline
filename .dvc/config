@@ -1,1 +1,4 @@
-
+[core]
+    remote = name
+['remote "name"']
+    url = s3://mybucket123dvc
